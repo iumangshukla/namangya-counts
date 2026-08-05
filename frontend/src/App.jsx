@@ -5,6 +5,8 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import SiteAnalytics from './pages/SiteAnalytics';
 
+import AdminDashboard from './pages/AdminDashboard';
+
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,6 +41,10 @@ function App() {
           <Route 
             path="/site/:siteKey" 
             element={user ? <SiteAnalytics /> : <Navigate to="/" />} 
+          />
+          <Route 
+            path="/admin" 
+            element={user?.isAdmin ? <AdminDashboard user={user} /> : <Navigate to="/" />} 
           />
         </Routes>
       </main>

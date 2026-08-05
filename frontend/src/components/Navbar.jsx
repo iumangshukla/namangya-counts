@@ -23,6 +23,9 @@ const Navbar = ({ user, setUser }) => {
         <div className="flex gap-4 items-center">
           {user ? (
             <>
+              {user.isAdmin && (
+                <Link to="/admin" className="btn btn-secondary" style={{ borderColor: 'var(--color-primary)' }}>Admin</Link>
+              )}
               <Link to="/dashboard" className="btn btn-secondary">Dashboard</Link>
               <div className="flex items-center gap-2 ml-4">
                 <img src={user.avatarUrl} alt="Avatar" style={{ width: 32, height: 32, borderRadius: '50%' }} />
