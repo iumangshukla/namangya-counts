@@ -48,6 +48,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/sites', require('./routes/sites'));
 app.use('/api/track', require('./routes/track'));
 app.use('/api/counts', require('./routes/counts'));
+app.use('/api/admin', require('./routes/admin'));
 
 app.get('/health', (req, res) => res.send('OK'));
 

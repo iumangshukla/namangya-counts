@@ -21,6 +21,12 @@ module.exports = function (passport) {
               user.avatarUrl = profile.photos[0].value;
             }
             user.profileUrl = profile.profileUrl;
+            
+            // Check admin status
+            if (process.env.ADMIN_GITHUB_USERNAME && profile.username.toLowerCase() === process.env.ADMIN_GITHUB_USERNAME.toLowerCase()) {
+              user.isAdmin = true;
+            }
+            
             await user.save();
             return done(null, user);
           } else {
@@ -31,6 +37,12 @@ module.exports = function (passport) {
               profileUrl: profile.profileUrl,
               avatarUrl: profile.photos && profile.photos.length > 0 ? profile.photos[0].value : ''
             };
+            
+            // Check admin status
+            if (process.env.ADMIN_GITHUB_USERNAME && profile.username.toLowerCase() === process.env.ADMIN_GITHUB_USERNAME.toLowerCase()) {
+              newUser.isAdmin = true;
+            }
+            
             user = await User.create(newUser);
             return done(null, user);
           }
