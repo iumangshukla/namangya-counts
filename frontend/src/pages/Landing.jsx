@@ -19,7 +19,7 @@ const Landing = ({ user }) => {
             Go to Dashboard
           </Link>
         ) : (
-          <a href="http://localhost:5000/api/auth/github" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
+          <a href="http://localhost:5001/api/auth/github" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
             Get Started with GitHub
           </a>
         )}
