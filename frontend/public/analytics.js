@@ -1,6 +1,6 @@
 (function() {
   // Config
-  const API_URL = 'http://localhost:5000/api/track'; // In production, this would point to the deployed backend
+  const API_URL = 'http://localhost:5001/api/track'; // In production, this would point to the deployed backend
   
   // Extract site_key from the script tag's data attribute
   const scriptTag = document.currentScript || document.querySelector('script[data-site-key]');

@@ -29,7 +29,8 @@ const getVisitorHash = (ip, userAgent, siteKey) => {
 // @route   POST /api/track/pageview
 router.post('/pageview', async (req, res) => {
   try {
-    const { siteKey, path, referrer, width } = req.body;
+    const { path, referrer, width } = req.body;
+    const siteKey = req.body.siteKey ? String(req.body.siteKey) : null;
 
     if (!siteKey) {
       return res.status(400).json({ error: 'siteKey is required' });

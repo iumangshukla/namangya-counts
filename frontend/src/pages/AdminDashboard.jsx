@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Users, Globe, Eye, Trash2 } from 'lucide-react';
 
 const AdminDashboard = ({ user }) => {
@@ -12,9 +13,9 @@ const AdminDashboard = ({ user }) => {
     const fetchData = async () => {
       try {
         const [statsRes, usersRes, sitesRes] = await Promise.all([
-          fetch('http://localhost:5000/api/admin/stats', { credentials: 'include' }),
-          fetch('http://localhost:5000/api/admin/users', { credentials: 'include' }),
-          fetch('http://localhost:5000/api/admin/sites', { credentials: 'include' })
+          fetch('http://localhost:5001/api/admin/stats', { credentials: 'include' }),
+          fetch('http://localhost:5001/api/admin/users', { credentials: 'include' }),
+          fetch('http://localhost:5001/api/admin/sites', { credentials: 'include' })
         ]);
 
         if (statsRes.ok && usersRes.ok && sitesRes.ok) {
@@ -34,41 +35,50 @@ const AdminDashboard = ({ user }) => {
     fetchData();
   }, []);
 
-  const handleDeleteUser = async (userId) => {
-    if (!confirm('Are you sure? This will delete the user and ALL their sites and pageviews permanently.')) return;
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [siteToDelete, setSiteToDelete] = useState(null);
+
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+      const res = await fetch(`http://localhost:5001/api/admin/users/${userToDelete._id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
       if (res.ok) {
-        setUsers(users.filter(u => u._id !== userId));
-        // We'd also ideally refresh stats and sites here, but removing from local state is fine for now
+        setUsers(users.filter(u => u._id !== userToDelete._id));
       } else {
         const err = await res.json();
         alert(err.error || 'Failed to delete user');
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setUserToDelete(null);
     }
   };
 
-  const handleDeleteSite = async (siteId) => {
-    if (!confirm('Are you sure? This will delete the site and ALL its pageviews permanently.')) return;
+  const confirmDeleteSite = async () => {
+    if (!siteToDelete) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/sites/${siteId}`, {
+      const res = await fetch(`http://localhost:5001/api/admin/sites/${siteToDelete._id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
       if (res.ok) {
-        setSites(sites.filter(s => s._id !== siteId));
+        setSites(sites.filter(s => s._id !== siteToDelete._id));
       } else {
         alert('Failed to delete site');
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setSiteToDelete(null);
     }
   };
+
+  const handleDeleteUser = (user) => setUserToDelete(user);
+  const handleDeleteSite = (site) => setSiteToDelete(site);
 
   if (loading) return <div className="container mt-8"><p>Loading admin panel...</p></div>;
   if (!user?.isAdmin) return <div className="container mt-8"><p>Access Denied.</p></div>;
@@ -148,7 +158,7 @@ const AdminDashboard = ({ user }) => {
                   <td className="py-3 text-right">
                     {!u.isAdmin && (
                       <button 
-                        onClick={() => handleDeleteUser(u._id)} 
+                        onClick={() => handleDeleteUser(u)} 
                         className="btn btn-secondary" 
                         style={{ color: '#ff4d4d', padding: '0.3rem 0.5rem' }}
                         title="Delete User"
@@ -181,7 +191,7 @@ const AdminDashboard = ({ user }) => {
                   <td className="py-3 text-muted">{new Date(s.createdAt).toLocaleDateString()}</td>
                   <td className="py-3 text-right">
                     <button 
-                      onClick={() => handleDeleteSite(s._id)} 
+                      onClick={() => handleDeleteSite(s)} 
                       className="btn btn-secondary" 
                       style={{ color: '#ff4d4d', padding: '0.3rem 0.5rem' }}
                       title="Delete Site"
@@ -195,6 +205,60 @@ const AdminDashboard = ({ user }) => {
           </table>
         )}
       </div>
+
+      {/* Delete User Modal */}
+      {userToDelete && createPortal(
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 9999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(5px)'
+        }}>
+          <div className="glass-card p-8 animate-fade-in text-center" style={{ maxWidth: '400px', width: '90%' }}>
+            <div style={{ display: 'inline-flex', padding: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: '50%', color: '#ef4444', marginBottom: '1rem' }}>
+              <Trash2 size={32} />
+            </div>
+            <h2 className="mb-2">Delete User?</h2>
+            <p className="mb-6">Are you absolutely sure you want to delete the user <strong>{userToDelete.username}</strong>? All of their registered sites and analytics data will be permanently lost.</p>
+            <div className="flex gap-4 justify-center">
+              <button onClick={() => setUserToDelete(null)} className="btn btn-secondary flex-1">
+                Cancel
+              </button>
+              <button onClick={confirmDeleteUser} className="btn btn-primary flex-1" style={{ background: '#ef4444', boxShadow: '0 4px 14px 0 rgba(239, 68, 68, 0.39)' }}>
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Delete Site Modal */}
+      {siteToDelete && createPortal(
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 9999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(5px)'
+        }}>
+          <div className="glass-card p-8 animate-fade-in text-center" style={{ maxWidth: '400px', width: '90%' }}>
+            <div style={{ display: 'inline-flex', padding: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: '50%', color: '#ef4444', marginBottom: '1rem' }}>
+              <Trash2 size={32} />
+            </div>
+            <h2 className="mb-2">Delete Site?</h2>
+            <p className="mb-6">Are you absolutely sure you want to delete <strong>{siteToDelete.name}</strong>? All analytics data will be permanently lost.</p>
+            <div className="flex gap-4 justify-center">
+              <button onClick={() => setSiteToDelete(null)} className="btn btn-secondary flex-1">
+                Cancel
+              </button>
+              <button onClick={confirmDeleteSite} className="btn btn-primary flex-1" style={{ background: '#ef4444', boxShadow: '0 4px 14px 0 rgba(239, 68, 68, 0.39)' }}>
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

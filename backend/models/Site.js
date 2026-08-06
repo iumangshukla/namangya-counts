@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 const SiteSchema = new mongoose.Schema({
   userId: {
@@ -15,7 +15,7 @@ const SiteSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    default: uuidv4
+    default: () => crypto.randomUUID()
   },
   allowedDomains: {
     type: [String],

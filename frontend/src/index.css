@@ -28,6 +28,20 @@
   --transition-normal: 250ms ease-in-out;
 }
 
+.light-theme {
+  --color-bg-dark: #f8fafc;
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #e2e8f0;
+  
+  --color-text-main: #0f172a;
+  --color-text-muted: #64748b;
+
+  --color-border: #e2e8f0;
+  
+  --shadow-glow: 0 0 20px rgba(255, 127, 80, 0.2);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -41,14 +55,15 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
 /* Glassmorphism Utilities */
 .glass {
-  background: rgba(24, 28, 34, 0.6);
+  background: var(--color-bg-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
 }
 
 .glass-card {
@@ -56,7 +71,7 @@ body {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-normal), border-color var(--transition-normal);
 }
 
 .glass-card:hover {
@@ -70,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: 1.2;
   margin-bottom: 0.5em;
-  color: #ffffff;
+  color: var(--color-text-main);
 }
 
 h1 { font-size: 2.5rem; letter-spacing: -0.025em; }
@@ -204,7 +219,7 @@ input:focus {
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-text-main);
   text-decoration: none;
   display: flex;
   align-items: center;

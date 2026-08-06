@@ -13,7 +13,7 @@ function App() {
 
   useEffect(() => {
     // Check auth status
-    fetch('http://localhost:5000/api/auth/me', { credentials: 'include' })
+    fetch('http://localhost:5001/api/auth/me', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data.isAuthenticated) {
